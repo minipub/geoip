@@ -38,9 +38,19 @@ func GetIpLeading(w http.ResponseWriter, r *http.Request) {
 	} else if len(headers["X-Real-Ip"]) > 0 {
 		ip = headers["X-Real-Ip"][0]
 	} else {
-		panic("no ip detect")
+		if r.RemoteAddr == "" {
+			panic("no ip detect")
+		} else {
+			if r.RemoteAddr[0] == '[' {
+				// ipv6 address [::1]:8080
+				ip = r.RemoteAddr[1:strings.Index(r.RemoteAddr, "]")]
+			} else {
+				ip = r.RemoteAddr[:strings.Index(r.RemoteAddr, ":")]
+			}
+		}
 	}
 
+	log.Printf("[ User IP ] %s", ip)
 	// ip = "13.112.109.30"
 
 	var res string
