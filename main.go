@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -70,15 +71,12 @@ func GetIpLeading(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetIPDBPath() string {
-	var path string
-
+	path := "."
 	if os.Getenv("GEOIP_WORKPATH") != "" {
 		path = os.Getenv("GEOIP_WORKPATH")
 	}
-
 	filename := "ipipfree.ipdb"
-
-	return fmt.Sprintf("%s%s", path, filename)
+	return filepath.Join(path, filename)
 }
 
 func GetIpByDB(ip string) (rs string, e error) {
