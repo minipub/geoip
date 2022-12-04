@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -59,7 +60,13 @@ func GetIpLeading(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	fmt.Fprintf(w, res)
+	fmt.Fprintf(w, "%s\n", res)
+
+	// print all headers
+	fmt.Println()
+	for k, v := range headers {
+		fmt.Fprintf(w, "%s: %+v\n", k, v)
+	}
 }
 
 func GetIPDBPath() string {
@@ -184,8 +191,22 @@ func httpRequestGet(
 }
 
 func main() {
+	args := os.Args
+	if len(args) != 2 {
+		fmt.Fprint(os.Stderr, "wrong argument: only 1 arguments.\n")
+		os.Exit(-1)
+	}
+
+	port, err := strconv.Atoi(args[1])
+	if err != nil {
+		fmt.Fprint(os.Stderr, "wrong argument: Port should be INT.\n")
+		os.Exit(-1)
+	}
+
 	http.HandleFunc("/getIpInfo", GetIpLeading)
-	err := http.ListenAndServe(":8000", nil)
+
+	log.Printf("Listening on Port :%d", port)
+	err = http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
